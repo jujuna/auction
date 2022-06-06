@@ -15,8 +15,6 @@ def validate_length(value):
         )
 
 
-
-
 class MyUserManager(BaseUserManager):
     def create_user(self, username, email, phone, address, last_name, first_name, passport_id, password=None):
         if not username:
@@ -48,7 +46,7 @@ class MyUserManager(BaseUserManager):
 
     def create_superuser(self, email, password):
         user = self.model(
-            email = self.normalize_email(email),
+            email=self.normalize_email(email),
         )
         user.set_password(password)
         user.is_admin = True
