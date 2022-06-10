@@ -36,6 +36,7 @@ class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('მომხმარებელი'))
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('პროდუქტი'))
     price = models.IntegerField(default=0)
+    time = models.DateTimeField(auto_now_add=True, verbose_name=_('დრო'))
 
     def __str__(self):
         return self.product.name
@@ -43,8 +44,12 @@ class Bid(models.Model):
     def save(self, *args, **kwargs):
         if self.price == 0:
             self.product.current_price += 1
+            self.product.save()
+            self.price = self.product.current_price
         else:
-            self.product.current_price = self.price
+            self.product.current_price += self.price
+            self.product.save()
+
         super(Bid, self).save(*args, **kwargs)
 
 
