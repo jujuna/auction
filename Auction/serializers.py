@@ -37,6 +37,6 @@ class BidSerializer(serializers.ModelSerializer):
 
         if data.get('price'):
             if data.get('product').current_price > data.get('price'):
-                raise ValidationError({"price_error": "შენი შეთავაზება მიმდინარე ფასზე ნაკლებია"})
+                raise ValidationError({"price_error": "შენი შეთავაზება მიმდინარე ფასზე მეტი უნდა იყოს"})
 
         return data

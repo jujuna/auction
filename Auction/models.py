@@ -22,6 +22,7 @@ class Product(models.Model):
     current_price = models.IntegerField(verbose_name=_('მიმდინარე ფასი'), default=0)
     send_to_email = models.BooleanField()
     time = models.DateTimeField(auto_now=True, verbose_name=_('დრო'))
+    sold = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -37,6 +38,7 @@ class Bid(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('პროდუქტი'))
     price = models.IntegerField(default=0)
     time = models.DateTimeField(auto_now_add=True, verbose_name=_('დრო'))
+    accept = models.BooleanField(default=False)
 
     def __str__(self):
         return self.product.name
@@ -47,7 +49,7 @@ class Bid(models.Model):
             self.product.save()
             self.price = self.product.current_price
         else:
-            self.product.current_price += self.price
+            self.product.current_price += self.price - self.product.current_price
             self.product.save()
 
         super(Bid, self).save(*args, **kwargs)

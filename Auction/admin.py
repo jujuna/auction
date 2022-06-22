@@ -8,7 +8,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class BidAdmin(admin.ModelAdmin):
-    readonly_fields = ('time',)
+    readonly_fields = ('time', 'id')
 
 
 admin.site.register(Category)
