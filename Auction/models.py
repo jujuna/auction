@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-
+from django.utils import timezone
 User = get_user_model()
 
 
@@ -23,6 +23,7 @@ class Product(models.Model):
     send_to_email = models.BooleanField()
     time = models.DateTimeField(auto_now=True, verbose_name=_('დრო'))
     sold = models.BooleanField(default=False)
+    sold_time = models.DateTimeField(null=True, blank=True,)
 
     def __str__(self):
         return self.name
@@ -38,10 +39,11 @@ class Bid(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('პროდუქტი'))
     price = models.IntegerField(default=0)
     time = models.DateTimeField(auto_now_add=True, verbose_name=_('დრო'))
+    time.editable = True
     accept = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.product.name
+        return self.product.name + ' -> ' + str(self.price)
 
     def save(self, *args, **kwargs):
         if self.price == 0:

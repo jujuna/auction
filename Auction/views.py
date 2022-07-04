@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics
 from rest_framework.response import Response
 from .serializers import CategorySerializer, ProductSerializer, BidSerializer
 from .models import Category, Product, Bid
@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import NotFound
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -65,8 +66,9 @@ class BidAccept(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         bid = self.get_object()
-        product = Product.objects.get(id=request.data['product'])
+        product = Product.objects.get(id=bid.product.id)
         if self.request.user == product.user:
+            product.sold_time = timezone.now()
             bid.accept = True
             product.sold = True
             bid.save()
