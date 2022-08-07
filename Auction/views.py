@@ -1,7 +1,7 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import CategorySerializer, ProductSerializer, BidSerializer
-from .models import Category, Product, Bid
+from .models import Category, Product, Bid, SoldProduct
 from rest_framework.permissions import IsAdminUser
 from django.conf import settings
 from django.core.mail import send_mail
@@ -31,6 +31,7 @@ class ProductView(generics.ListCreateAPIView):
 class BidView(generics.ListCreateAPIView):
     serializer_class = BidSerializer
     queryset = Bid.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -50,12 +51,13 @@ class BidView(generics.ListCreateAPIView):
 
 
 class BidAccept(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-    def send_email_to_buyer(self, product, price, email):
+    def send_email_to_buyer(self, product, price):
         subject = f'გილოცავ! შენ მოიგე {product}'
         message = f'{product} შენია {price} ლარად.'
         email_from = settings.EMAIL_HOST_USER
-        recipient_list = [email]
+        recipient_list = ['zhuzhunadze1@gmail.com',]
         send_mail(subject, message, email_from, recipient_list)
 
     def get_object(self):
@@ -67,12 +69,18 @@ class BidAccept(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         bid = self.get_object()
         product = Product.objects.get(id=bid.product.id)
+        if bid.accept is True:
+            return Response({'error': 'უკვე დადასტურებულია'})
         if self.request.user == product.user:
             product.sold_time = timezone.now()
             bid.accept = True
             product.sold = True
             bid.save()
             product.save()
-            self.send_email_to_buyer(product.name, bid.price, bid.user.email)
+            if product.send_to_email:
+                self.send_email_to_buyer(product.name, bid.price)
+            SoldProduct.objects.create(product=product, bid=bid)
 
-        return Response({"created"})
+            return Response({'success': 'პროდუქტი გაიყიდა'})
+
+        return Response({'error': 'უფლება არ გაქვს'})

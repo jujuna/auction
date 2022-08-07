@@ -57,3 +57,10 @@ class Bid(models.Model):
         super(Bid, self).save(*args, **kwargs)
 
 
+class SoldProduct(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('პროდუქტი'))
+    bid = models.ForeignKey(Bid, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('ბიდი'))
+    time = models.DateTimeField(auto_now=True, verbose_name=_('დრო'))
+
+    def __str__(self):
+        return f'{self.product} - > ფასი - > {self.bid.price}'

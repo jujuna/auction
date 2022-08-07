@@ -68,7 +68,6 @@ class RecommendedProduct(APIView):
         stats = self.statistic()
 
         if len(stats['number_list']) >= 10:
-            print(stats['common'])
             data = Product.objects.all().filter(category_id__in=stats['common']).values()
             return Response({"data": data})
         else:

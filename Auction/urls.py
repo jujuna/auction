@@ -6,5 +6,4 @@ urlpatterns = [
     path('product/', ProductView.as_view(), name='products'),
     path('bids/', BidView.as_view(), name='bid'),
     path('accept/<int:pk>/', BidAccept.as_view(), name='accept'),
-
 ]
